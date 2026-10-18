@@ -9,6 +9,12 @@ FastAPI принимает MOV, возвращает идентификатор 
 
 ## Материалы для жюри
 
+**Веб-интерфейс:** https://unemployed-forte.tail8454e0.ts.net/
+
+**API base URL:** https://unemployed-forte.tail8454e0.ts.net
+
+Ключ передаётся жюри приватно. [Доступ и маршруты API](submission/SERVICE_ACCESS.md).
+
 - [Презентация PDF — 7 слайдов](submission/pitch.pdf)
 - [Презентация HTML](submission/pitch.html)
 - [Проверки, измерения и ограничения](submission/VERIFICATION.md)
