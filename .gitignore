@@ -1,0 +1,14 @@
+local_only/
+reports/
+.cache/
+.tmp/
+.venv/
+.env*
+__pycache__/
+*.pyc
+*.mov
+*.mp4
+*.jpg
+*.png
+*.safetensors
+*.bin

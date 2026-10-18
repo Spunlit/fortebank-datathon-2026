@@ -1,0 +1,24 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Проверка кассовых операций</title>
+<style>body{font:17px system-ui;background:#101725;color:#eaf0fa;max-width:880px;margin:48px auto;padding:0 24px}h1{font-size:32px}p{line-height:1.5}.notice{border-left:4px solid #f5ba56;padding:12px 18px;background:#252631}form,article{background:#1b2639;border-radius:14px;padding:24px;margin:24px 0}label{display:block;margin:16px 0 8px}input{max-width:100%;box-sizing:border-box}input[type=password]{padding:12px;width:100%;background:#101725;color:white;border:1px solid #64748b;border-radius:6px}button{padding:12px 24px;background:#91e5ce;border:0;border-radius:8px;font:inherit;margin-top:24px;cursor:pointer}button:disabled{opacity:.5}img{max-width:100%;max-height:620px}#status{white-space:pre-wrap}small{color:#bdc9d9}</style>
+<h1>Проверка кассовых операций</h1>
+<p>Загрузите видео .mov. Анализ выполняется локально, без звука и идентификации лиц.</p>
+<p class="notice">Экспериментальная версия. Детектор отклонён по качеству на development: возможны частые ложные срабатывания и пропуски. Результаты требуют проверки человеком.</p>
+<form id="form"><label for="key">API-ключ</label><input id="key" type="password" required autocomplete="off">
+<label for="file">Видео .mov, до 100 МиБ</label><input id="file" type="file" accept=".mov" required>
+<br><button id="submit">Проверить видео</button></form>
+<p id="status" role="status" aria-live="polite"></p><section id="result"></section>
+<small>Нормативная связь пока не подтверждена. Ссылка на документ служит справкой, а не юридическим заключением.</small>
+<script>
+const form=document.querySelector('#form'),status=document.querySelector('#status'),result=document.querySelector('#result'),button=document.querySelector('#submit');
+const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function text(tag,value,parent){const el=document.createElement(tag);el.textContent=value;parent.append(el);return el}
+form.addEventListener('submit',async event=>{event.preventDefault();result.replaceChildren();button.disabled=true;
+const headers={'X-API-Key':document.querySelector('#key').value};
+async function api(url,opts={}){const r=await fetch(url,{...opts,headers,signal:AbortSignal.timeout(300000)});const data=await r.json();if(!r.ok)throw Error(data.detail||`HTTP ${r.status}`);return data}
+try{status.textContent='Проверка готовности модели…';const health=await api('/api/v1/health');if(!health.ready)throw Error('Модель загружается. Повторите через минуту.');
+const body=new FormData();body.append('file',document.querySelector('#file').files[0]);status.textContent='Загрузка видео…';const start=Date.now();const job=await api('/api/v1/analyze',{method:'POST',body});
+while(true){const data=await api('/api/v1/jobs/'+job.job_id);if(data.status==='failed')throw Error('Обработка не завершена: '+data.error);
+if(data.status==='done'){status.textContent=data.verdict==='violation'?'Обнаружены признаки возможных нарушений':'Нарушение не обнаружено';for(const v of data.violations){const card=document.createElement('article');result.append(card);text('h2',v.type,card);text('p',`Кандидат: ${v.timecode_sec.toFixed(3)} с`,card);text('p',v.description,card);for(const f of v.evidence_frames){text('p',`Кадр: ${f.timestamp_sec.toFixed(3)} с`,card);const img=document.createElement('img');img.src='data:image/jpeg;base64,'+f.image_base64;img.alt='Кадр для локальной проверки';card.append(img)}}break}
+status.textContent=`Обработка / ожидание очереди: ${Math.round((Date.now()-start)/1000)} с`;if(Date.now()-start>300000)throw Error('Истёк срок ожидания результата');await pause(1000)}}catch(error){status.textContent='Ошибка: '+error.message}finally{button.disabled=false}});
+</script></html>
