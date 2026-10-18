@@ -48,6 +48,17 @@ def decode_targets(path, windows):
             if index == len(targets):
                 break
             previous = frame, stamp
+        # The final frame remains visible through its declared duration. At low
+        # frame rates a target near EOF can lie after its PTS but inside that span.
+        if index < len(targets) and previous is not None:
+            last_frame,last_pts=previous
+            span=float((last_frame.duration or 0)*last_frame.time_base)
+            end=last_pts+span
+            if stream.duration is not None:
+                end=min(end,float(stream.duration*stream.time_base))
+            while index < len(targets) and last_pts <= targets[index] < end:
+                image=last_frame.to_image();image.thumbnail((448,768))
+                selected[targets[index]]=(image,last_pts);index+=1
     if index != len(targets):
         raise ValueError('Incomplete temporal coverage')
     for window in windows:

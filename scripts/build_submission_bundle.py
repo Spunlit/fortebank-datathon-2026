@@ -10,7 +10,7 @@ FILES=[
  'service/__init__.py','service/app.py','service/worker.py','service/detector.py','service/index.html',
  'scripts/serve.py','scripts/start_local_api.py','scripts/full_scan.py','scripts/check_service.py','scripts/build_submission_bundle.py',
  'astra6_control/local_bridge/gpu_lease.py','astra6_control/tests/test_service_gpu_lease.py',
- 'astra6_control/tests/test_service_pipe.py','LICENSES.md','requirements-service.txt',
+ 'astra6_control/tests/test_service_pipe.py','astra6_control/tests/test_service_frame_tail.py','LICENSES.md','requirements-service.txt',
  'submission/README.md','submission/SUBMISSION_CHECKLIST.md','submission/PITCH_SCRIPT.md','submission/PUBLIC_ACCESS_PLAN.md',
  'submission/VERIFICATION.md','submission/requirements-inference.txt','submission/SERVICE_ACCESS.md',
  'submission/pitch.html','submission/pitch.pdf','submission/demo_upload.png','submission/demo_result.png',
